@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Text;
 
+using LCRGame.Models;
+
 namespace LCRGame.Services
 {
     public interface IDiceService
     {
-        TDiceSideType RollDice <TDiceSideType> (TDiceSideType[] diceSides) where TDiceSideType : Enum;
+        LCRDiceSides RollDie();
+        public LCRDiceSides[] RollDice(int diceCount);
     }
 }
