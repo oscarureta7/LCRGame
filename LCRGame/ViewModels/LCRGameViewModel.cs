@@ -17,6 +17,8 @@ namespace LCRGame.ViewModels
     public class LCRGameViewModel : BindableBase
     {
         private const int default_player_chips = 3;
+        private const int default_minimum_players = 3;
+        private const int default_maximum_players = 7;
 
         private IDiceService _diceService;
         private ISimulationService _simulationService;
@@ -38,7 +40,6 @@ namespace LCRGame.ViewModels
         private ObservableCollection<Player> _players;
         public ObservableCollection<Player> Players {
             get => _players;
-            set => _players = value;
         }
 
         private ObservableCollection<LCRSimulationResult> _output;
@@ -47,22 +48,25 @@ namespace LCRGame.ViewModels
             get => _output;
         }
 
-        private ICommand _addPlayerCommand;
-        public ICommand AddPlayerCommand
+        private DelegateCommand _addPlayerCommand;
+        public DelegateCommand AddPlayerCommand
         {
             get => _addPlayerCommand;
+            private set => _addPlayerCommand = value;
         }
 
-        private ICommand _removePlayerCommand;
-        public ICommand RemovePlayerCommand
+        private DelegateCommand _removePlayerCommand;
+        public DelegateCommand RemovePlayerCommand
         {
             get => _removePlayerCommand;
+            private set => _removePlayerCommand = value;
         }
 
         private DelegateCommand<int?> _startSimulationCommand;
         public DelegateCommand<int?> StartSimulationCommand
         {
             get => _startSimulationCommand;
+            private set => _startSimulationCommand = value;
         }
 
         public LCRGameViewModel(IDiceService diceService, ISimulationService simulationService) {
@@ -72,34 +76,64 @@ namespace LCRGame.ViewModels
             _players = new ObservableCollection<Player>();
             _output = new ObservableCollection<LCRSimulationResult>();
 
-            _addPlayerCommand = new DelegateCommand(OnAddPlayer);
-            _removePlayerCommand = new DelegateCommand(OnRemovePlayer);
-            _startSimulationCommand = new DelegateCommand<int?>(OnStartSimulation);
+            _addPlayerCommand = new DelegateCommand(OnAddPlayer, CanAdd);
+            _removePlayerCommand = new DelegateCommand(OnRemovePlayer, CanRemove);
+            _startSimulationCommand = new DelegateCommand<int?>(OnStartSimulation, CanSimulate);
+
+            // Add default players
+            _players.Add(new Player("Andrea"));
+            _players.Add(new Player("Abigail"));
+            _players.Add(new Player("Omar"));
         }
 
         public void OnAddPlayer() {
-            if (!string.IsNullOrEmpty(_selectedPlayerName) && !_players.Contains(_selectedPlayer))
+            if (!string.IsNullOrEmpty(_selectedPlayerName))
             {
                 Players.Add(new Player(_selectedPlayerName));
                 SelectedPlayerName = string.Empty;
+
+                // NOTE: Added manual invocation of RaiseCanExecuteChanged due to time constraints.
+                StartSimulationCommand.RaiseCanExecuteChanged();
+                AddPlayerCommand.RaiseCanExecuteChanged();
+                RemovePlayerCommand.RaiseCanExecuteChanged();
             }
         }
         public void OnRemovePlayer() {
-            if (_players.Contains(_selectedPlayer))
+            if (_players.Contains(_selectedPlayer) && _players.Count > default_minimum_players)
             {
                 Players.Remove(_selectedPlayer);
                 SelectedPlayerName = string.Empty;
+
+                // NOTE: Added manual invocation of RaiseCanExecuteChanged due to time constraints.
+                StartSimulationCommand.RaiseCanExecuteChanged();
+                AddPlayerCommand.RaiseCanExecuteChanged();
+                RemovePlayerCommand.RaiseCanExecuteChanged();
             }
         }
 
         public void OnStartSimulation(int? matches) {
 
-            if (matches == null)
+            if (matches == null || _players.Count < default_minimum_players)
                 return;
 
             LCRSimulationResult result =_simulationService.Simulate(
                 _players.ToList<Player>().ToArray(), default_player_chips, matches.Value, _diceService);
             Output.Add(result);
+        }
+
+        public bool CanSimulate(int? matches)
+        {
+            return Players.Count >= default_minimum_players;
+        }
+
+        public bool CanRemove()
+        {
+            return Players.Count > default_minimum_players;
+        }
+
+        public bool CanAdd()
+        {
+            return Players.Count < default_maximum_players;
         }
     }
 }

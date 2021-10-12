@@ -33,7 +33,12 @@
                 </Grid.RowDefinitions>
 
                 <Label Content="Player:" Grid.Column="0" Grid.Row="0"/>
-                <TextBox x:Name="PlayerNameTextBox" Width="auto" Grid.Column="1" Grid.Row="0" Text="{Binding SelectedPlayerName}"/>
+                <TextBox x:Name="PlayerNameTextBox" 
+                         Width="auto" 
+                         Grid.Column="1" 
+                         Grid.Row="0" 
+                         Text="{Binding SelectedPlayerName}"
+                         Style="{StaticResource PLAYER_NAME_TEXTBOX}"/>
 
                 <StackPanel Orientation="Horizontal" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Right">
                     <Button Content="Add" Command="{Binding AddPlayerCommand}" 
@@ -50,7 +55,7 @@
                       Style="{StaticResource GENERAL_LISTVIEW}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <Label Content="{Binding Name}" />
+                        <TextBlock Text="{Binding Name}" />
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
@@ -91,7 +96,8 @@
         <Label Grid.Row="1" Grid.Column="2" Content="Results:"/>
         <DockPanel Grid.Row="2" Grid.Column="2">
             <ListView ItemsSource="{Binding Output}"
-                      Style="{StaticResource GENERAL_LISTVIEW}">
+                      Style="{StaticResource GENERAL_LISTVIEW}"
+                      ItemContainerStyle="{StaticResource LOG_LISTVIEWITEM}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <Grid>
@@ -106,16 +112,16 @@
                                 <RowDefinition Height="auto"/>
                             </Grid.RowDefinitions>
                             
-                            <Label Content="Time stamp:" Grid.Column="0" Grid.Row="0"/>
+                            <TextBlock Text="Time stamp:" Grid.Column="0" Grid.Row="0"/>
                             <TextBlock Text="{Binding TimeStamp}" Grid.Column="1" Grid.Row="0"/>
 
-                            <Label Content="Longest:" Grid.Column="0" Grid.Row="1"/>
+                            <TextBlock Text="Longest:" Grid.Column="0" Grid.Row="1"/>
                             <TextBlock Text="{Binding LongestGame}" Grid.Column="1" Grid.Row="1"/>
 
-                            <Label Content="Shortest:" Grid.Column="0" Grid.Row="2"/>
+                            <TextBlock Text="Shortest:" Grid.Column="0" Grid.Row="2"/>
                             <TextBlock Text="{Binding ShortestGame}" Grid.Column="1" Grid.Row="2"/>
 
-                            <Label Content="Average:" Grid.Column="0" Grid.Row="3"/>
+                            <TextBlock Text="Average:" Grid.Column="0" Grid.Row="3"/>
                             <TextBlock Text="{Binding TimeStamp}" Grid.Column="1" Grid.Row="3"/>
                         </Grid>
                     </DataTemplate>
